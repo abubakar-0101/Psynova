@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-fraunces), 'Inter', system-ui, sans-serif;
+
+  /* ---- Legacy Psynova design tokens (still referenced by dashboard pages) ---- */
+  --color-primary: #4A90D9;
+  --color-primary-dark: #3a7ac9;
+  --color-sage: #7BAE9E;
+  --color-sage-dark: #6a9d8d;
+  --color-warm-white: #FAFAF9;
+  --color-light-gray: #F1F0EE;
+  --color-dark-text: #1A1A2E;
+  --color-muted: #6B7280;
+  --color-error: #E85D60;
+
+  /* ---- New v2 semantic tokens (theme-aware via :root / .dark below) ---- */
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-subtle: var(--subtle);
+  --color-border-subtle: var(--border-subtle);
+  --color-muted-fg: var(--muted-fg);
+
+  --color-brand: var(--brand);
+  --color-brand-from: var(--brand-from);
+  --color-brand-to: var(--brand-to);
+  --color-brand-accent: var(--brand-accent);
+
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+
+  --radius-card: 1rem;
+  --radius-input: 0.75rem;
+  --radius-badge: 9999px;
+}
+
+/* ============== LIGHT (default) ============== */
+:root {
+  --bg: #FAFAF9;
+  --fg: #0B0B14;
+  --surface: #FFFFFF;
+  --surface-elevated: #FFFFFF;
+  --subtle: #F4F4F2;
+  --border-subtle: rgba(15, 17, 23, 0.08);
+  --muted-fg: #6B7280;
+
+  /* Brand: indigo -> violet -> pink mesh */
+  --brand: #6366F1;
+  --brand-from: #6366F1;
+  --brand-to: #EC4899;
+  --brand-accent: #A855F7;
+
+  --success: #10B981;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px -8px rgba(15, 17, 23, 0.08);
+
+  /* Legacy alias for body background (used by old layout.tsx className) */
+  --background: var(--bg);
+  --foreground: var(--fg);
+  color-scheme: light;
+}
+
+/* ============== DARK ============== */
+.dark {
+  --bg: #07080C;
+  --fg: #ECEDEE;
+  --surface: #0F1117;
+  --surface-elevated: #14171F;
+  --subtle: #1B1F2A;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --muted-fg: #9BA1AB;
+
+  --brand: #818CF8;
+  --brand-from: #818CF8;
+  --brand-to: #F472B6;
+  --brand-accent: #C084FC;
+
+  --success: #34D399;
+  --danger: #F87171;
+  --warning: #FBBF24;
+
+  --glass-bg: rgba(20, 23, 31, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
+
+  --background: var(--bg);
+  --foreground: var(--fg);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Display heading utility ---- */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+  font-feature-settings: 'ss01';
+}
+
+/* ---- Brand gradient text + bg utilities ---- */
+.text-brand-gradient {
+  background: linear-gradient(110deg, var(--brand-from) 0%, var(--brand-accent) 50%, var(--brand-to) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(135deg, var(--brand-from) 0%, var(--brand-accent) 55%, var(--brand-to) 100%);
+}
+
+.bg-brand-mesh {
+  background:
+    radial-gradient(at 18% 20%, rgba(99, 102, 241, 0.20) 0px, transparent 50%),
+    radial-gradient(at 80% 30%, rgba(236, 72, 153, 0.18) 0px, transparent 50%),
+    radial-gradient(at 50% 80%, rgba(168, 85, 247, 0.18) 0px, transparent 50%);
+}
+
+.dark .bg-brand-mesh {
+  background:
+    radial-gradient(at 18% 20%, rgba(129, 140, 248, 0.25) 0px, transparent 50%),
+    radial-gradient(at 80% 30%, rgba(244, 114, 182, 0.22) 0px, transparent 50%),
+    radial-gradient(at 50% 80%, rgba(192, 132, 252, 0.22) 0px, transparent 50%);
+}
+
+/* ---- Glass card ---- */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-strong {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.15);
+}
+
+/* ---- Subtle gradient border (Linear-style) ---- */
+.ring-gradient {
+  position: relative;
+}
+.ring-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--brand-from), var(--brand-to));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-fg);
+}
+
+/* ---- Focus ring ---- */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* ---- Selection ---- */
+::selection {
+  background: var(--brand);
+  color: #fff;
+}

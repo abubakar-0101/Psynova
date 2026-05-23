@@ -1,0 +1,38 @@
+﻿src/controllers/admin.controller.ts(24,52): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/admin.controller.ts(34,61): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/admin.controller.ts(39,60): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/appointment.controller.ts(22,5): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/appointment.controller.ts(31,5): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/message.controller.ts(14,5): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/mood.controller.ts(34,52): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/mood.controller.ts(41,51): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/mood.controller.ts(49,37): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/notification.controller.ts(17,47): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/review.controller.ts(14,5): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/therapist.controller.ts(12,64): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/therapist.controller.ts(17,65): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/therapist.controller.ts(38,67): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/lib/stripe.ts(4,3): error TS2322: Type '"2024-12-18.acacia"' is not assignable to type '"2026-04-22.dahlia"'.
+src/middleware/validate.ts(9,49): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+src/middleware/validate.ts(9,61): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/repositories/notification.repository.ts(11,39): error TS2322: Type '{ userId: string; type: NotificationType; title: string; body: string; metadata?: Record<string, unknown> | undefined; }' is not assignable to type '(Without<NotificationCreateInput, NotificationUncheckedCreateInput> & NotificationUncheckedCreateInput) | (Without<...> & NotificationCreateInput)'.
+  Type '{ userId: string; type: NotificationType; title: string; body: string; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'Without<NotificationCreateInput, NotificationUncheckedCreateInput> & NotificationUncheckedCreateInput'.
+    Type '{ userId: string; type: NotificationType; title: string; body: string; metadata?: Record<string, unknown> | undefined; }' is not assignable to type 'NotificationUncheckedCreateInput'.
+      Types of property 'metadata' are incompatible.
+        Type 'Record<string, unknown> | undefined' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+          Type 'Record<string, unknown>' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+            Type 'Record<string, unknown>' is missing the following properties from type 'readonly (InputJsonValue | null)[]': length, concat, join, slice, and 20 more.

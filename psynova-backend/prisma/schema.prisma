@@ -1,0 +1,339 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CLIENT
+  THERAPIST
+  ADMIN
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum MessageType {
+  TEXT
+  FILE
+  VOICE
+  IMAGE
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  REFUNDED
+  FAILED
+}
+
+enum NotificationType {
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  NEW_MESSAGE
+  SESSION_REMINDER
+  REVIEW_RECEIVED
+  PAYMENT_RECEIVED
+  ACCOUNT_APPROVED
+  ACCOUNT_SUSPENDED
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
+  DISMISSED
+}
+
+enum ReportTargetType {
+  USER
+  THERAPIST
+  REVIEW
+  MESSAGE
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(CLIENT)
+  firstName    String
+  lastName     String
+  isVerified   Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  verifyToken  String?
+  resetToken   String?
+  resetTokenExpiry DateTime?
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  therapistProfile    Therapist?
+  clientAppointments  Appointment[]  @relation("ClientAppointments")
+  therapistAppointments Appointment[] @relation("TherapistAppointments")
+  clientConversations Conversation[] @relation("ClientConversations")
+  therapistConversations Conversation[] @relation("TherapistConversations")
+  sentMessages        Message[]
+  clientReviews       Review[]       @relation("ClientReviews")
+  therapistReviews    Review[]       @relation("TherapistReviews")
+  payments            Payment[]
+  notifications       Notification[]
+  moodEntries         MoodEntry[]
+  journalEntries      JournalEntry[]
+  filedReports        Report[]       @relation("FiledReports")
+  reportedUser        Report[]       @relation("ReportedUser")
+  sessionLogs         SessionLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Therapist {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio             String?  @db.Text
+  licenseNumber   String?
+  specializations String[]
+  languages       String[]
+  sessionPrice    Decimal  @default(0) @db.Decimal(10, 2)
+  yearsExperience Int      @default(0)
+  gender          String?
+  timezone        String   @default("UTC")
+  isApproved      Boolean  @default(false)
+  isOnline        Boolean  @default(false)
+  rating          Decimal  @default(0) @db.Decimal(3, 2)
+  reviewCount     Int      @default(0)
+  photoUrl        String?
+  photoPublicId   String?
+  education       Json?
+  certifications  Json?
+  sessionTypes    String[] @default(["ONLINE"])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  availabilitySlots AvailabilitySlot[]
+  appointments      Appointment[]
+  reviews           Review[]
+
+  @@index([isApproved])
+  @@index([specializations])
+  @@index([sessionPrice])
+  @@index([rating])
+}
+
+model AvailabilitySlot {
+  id          String   @id @default(uuid())
+  therapistId String
+  therapist   Therapist @relation(fields: [therapistId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int      // 0=Sunday, 6=Saturday
+  startTime   String   // "09:00"
+  endTime     String   // "10:00"
+  isRecurring Boolean  @default(true)
+  isBooked    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  appointments Appointment[]
+
+  @@index([therapistId])
+  @@index([dayOfWeek])
+}
+
+model Appointment {
+  id              String            @id @default(uuid())
+  clientId        String
+  client          User              @relation("ClientAppointments", fields: [clientId], references: [id])
+  therapistId     String
+  therapistUser   User              @relation("TherapistAppointments", fields: [therapistId], references: [id])
+  therapistProfile Therapist        @relation(fields: [therapistProfileId], references: [id])
+  therapistProfileId String
+  slotId          String?
+  slot            AvailabilitySlot? @relation(fields: [slotId], references: [id])
+  startTime       DateTime
+  endTime         DateTime
+  status          AppointmentStatus @default(PENDING)
+  meetingRoomId   String?
+  stripePaymentId String?
+  stripeSessionId String?
+  notes           String?           @db.Text
+  sessionNotes    String?           @db.Text
+  cancellationReason String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  review     Review?
+  payment    Payment?
+  sessionLog SessionLog?
+
+  @@index([clientId])
+  @@index([therapistId])
+  @@index([status])
+  @@index([startTime])
+}
+
+model Conversation {
+  id           String   @id @default(uuid())
+  clientId     String
+  client       User     @relation("ClientConversations", fields: [clientId], references: [id])
+  therapistId  String
+  therapist    User     @relation("TherapistConversations", fields: [therapistId], references: [id])
+  isUnlocked   Boolean  @default(false)
+  lastMessageAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  messages Message[]
+
+  @@unique([clientId, therapistId])
+  @@index([clientId])
+  @@index([therapistId])
+}
+
+model Message {
+  id             String      @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User        @relation(fields: [senderId], references: [id])
+  content        String?     @db.Text
+  type           MessageType @default(TEXT)
+  fileUrl        String?
+  filePublicId   String?
+  fileName       String?
+  isRead         Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([isRead])
+}
+
+model Review {
+  id             String      @id @default(uuid())
+  appointmentId  String      @unique
+  appointment    Appointment @relation(fields: [appointmentId], references: [id])
+  clientId       String
+  client         User        @relation("ClientReviews", fields: [clientId], references: [id])
+  therapistId    String
+  therapistUser  User        @relation("TherapistReviews", fields: [therapistId], references: [id])
+  therapist      Therapist   @relation(fields: [therapistProfileId], references: [id])
+  therapistProfileId String
+  rating         Int         // 1-5
+  comment        String?     @db.Text
+  isPublic       Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([therapistId])
+  @@index([clientId])
+  @@index([rating])
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  appointmentId   String        @unique
+  appointment     Appointment   @relation(fields: [appointmentId], references: [id])
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  stripeSessionId String?
+  stripePaymentIntentId String?
+  amount          Decimal       @db.Decimal(10, 2)
+  currency        String        @default("usd")
+  status          PaymentStatus @default(PENDING)
+  receiptUrl      String?
+  refundId        String?
+  refundAmount    Decimal?      @db.Decimal(10, 2)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  isRead    Boolean          @default(false)
+  metadata  Json?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model MoodEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mood      Int      // 1-10
+  note      String?  @db.Text
+  tags      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model JournalEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  content   String   @db.Text
+  isPrivate Boolean  @default(true)
+  wordCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Report {
+  id          String           @id @default(uuid())
+  reporterId  String
+  reporter    User             @relation("FiledReports", fields: [reporterId], references: [id])
+  targetId    String
+  targetUser  User             @relation("ReportedUser", fields: [targetId], references: [id])
+  targetType  ReportTargetType
+  reason      String           @db.Text
+  status      ReportStatus     @default(PENDING)
+  adminNotes  String?          @db.Text
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([reporterId])
+  @@index([targetId])
+  @@index([status])
+}
+
+model SessionLog {
+  id              String      @id @default(uuid())
+  appointmentId   String      @unique
+  appointment     Appointment @relation(fields: [appointmentId], references: [id])
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  joinedAt        DateTime    @default(now())
+  leftAt          DateTime?
+  durationMinutes Int?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([appointmentId])
+  @@index([userId])
+}
