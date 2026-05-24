@@ -270,7 +270,7 @@ export default function NotificationsPage() {
           )}
 
           {/* Infinite scroll sentinel */}
-          {hasMore && initialLoaded && visible.length > 0 && (
+          {hasMore && initialLoaded && (
             <div ref={sentinelRef} className="flex justify-center py-8">
               {loading && <Loader2 className="h-5 w-5 animate-spin text-[#6B7280]" />}
             </div>

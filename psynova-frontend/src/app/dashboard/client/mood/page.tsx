@@ -31,7 +31,7 @@ export default function MoodTrackerPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
-  const { data: entries = [] } = useQuery({
+  const { data: entries = [], isLoading } = useQuery({
     queryKey: ['mood'],
     queryFn: async () => {
       const res = await api.get('/api/wellness/mood?days=30');
@@ -139,24 +139,41 @@ export default function MoodTrackerPage() {
         {/* Stats + chart */}
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <Card className="text-center p-4">
-              <p className="text-2xl font-bold text-[#4A90D9]">{streak}</p>
-              <p className="text-xs text-[#6B7280]">Day Streak 🔥</p>
-            </Card>
-            <Card className="text-center p-4">
-              <p className="text-2xl font-bold text-[#7BAE9E]">
-                {entries.length > 0
-                  ? (entries.reduce((a: number, e: any) => a + e.mood, 0) / entries.length).toFixed(1)
-                  : '—'}
-              </p>
-              <p className="text-xs text-[#6B7280]">Avg Mood (30d)</p>
-            </Card>
+            {isLoading ? (
+              <>
+                <Card className="text-center p-4 animate-pulse">
+                  <div className="h-7 w-12 bg-gray-200 dark:bg-zinc-800 rounded-md mx-auto mb-2" />
+                  <div className="h-3.5 w-16 bg-gray-200 dark:bg-zinc-800 rounded-md mx-auto" />
+                </Card>
+                <Card className="text-center p-4 animate-pulse">
+                  <div className="h-7 w-12 bg-gray-200 dark:bg-zinc-800 rounded-md mx-auto mb-2" />
+                  <div className="h-3.5 w-20 bg-gray-200 dark:bg-zinc-800 rounded-md mx-auto" />
+                </Card>
+              </>
+            ) : (
+              <>
+                <Card className="text-center p-4">
+                  <p className="text-2xl font-bold text-[#4A90D9]">{streak}</p>
+                  <p className="text-xs text-[#6B7280]">Day Streak 🔥</p>
+                </Card>
+                <Card className="text-center p-4">
+                  <p className="text-2xl font-bold text-[#7BAE9E]">
+                    {entries.length > 0
+                      ? (entries.reduce((a: number, e: any) => a + e.mood, 0) / entries.length).toFixed(1)
+                      : '—'}
+                  </p>
+                  <p className="text-xs text-[#6B7280]">Avg Mood (30d)</p>
+                </Card>
+              </>
+            )}
           </div>
 
           <Card>
             <CardHeader><CardTitle>30-Day Trend</CardTitle></CardHeader>
             <CardContent>
-              {chartData.length > 0 ? (
+              {isLoading ? (
+                <div className="h-[200px] animate-pulse bg-gray-100 dark:bg-zinc-800 rounded-xl" />
+              ) : chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F1F0EE" />

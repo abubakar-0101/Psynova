@@ -1,14 +1,13 @@
 'use client';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Brain, Heart, Zap, Users, Rainbow, Flame, Moon, Focus } from 'lucide-react';
+import { Brain, Heart, Zap, Users, Flame, Moon, Focus } from 'lucide-react';
 
 const specializations = [
   { name: 'Anxiety', icon: Zap },
   { name: 'Depression', icon: Moon },
   { name: 'Trauma & PTSD', icon: Flame },
   { name: 'Couples Therapy', icon: Heart },
-  { name: 'LGBTQ+', icon: Rainbow },
   { name: 'Family Issues', icon: Users },
   { name: 'ADHD', icon: Focus },
   { name: 'Self-Esteem', icon: Brain },

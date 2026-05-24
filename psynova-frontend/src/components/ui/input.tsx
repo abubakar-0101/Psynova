@@ -12,12 +12,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           type={type}
           className={cn(
-            'flex h-11 w-full rounded-xl border border-[#F1F0EE] bg-white px-4 py-2 text-sm text-[#1A1A2E] placeholder:text-[#6B7280] transition-colors duration-200',
+            'flex h-11 w-full rounded-xl border px-4 py-2 text-sm transition-colors duration-200',
             'focus:outline-none focus:ring-2 focus:ring-[#4A90D9] focus:border-transparent',
             'disabled:cursor-not-allowed disabled:opacity-50',
             error && 'border-[#E85D60] focus:ring-[#E85D60]',
             className,
           )}
+          style={{
+            borderColor: 'var(--dash-border)',
+            background: 'var(--dash-surface)',
+            color: 'var(--dash-text)',
+          }}
           ref={ref}
           {...props}
         />

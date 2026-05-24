@@ -21,12 +21,13 @@ export const getDashboardStats = asyncHandler(async (_req: Request, res: Respons
 });
 
 export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
-  const { page = '1', limit = '20', search } = req.query as {
+  const { page = '1', limit = '20', search, role } = req.query as {
     page?: string;
     limit?: string;
     search?: string;
+    role?: string;
   };
-  const result = await adminService.getAllUsers(parseInt(page), parseInt(limit), search);
+  const result = await adminService.getAllUsers(parseInt(page), parseInt(limit), search, role);
   res.json({ success: true, data: result });
 });
 
@@ -75,4 +76,16 @@ export const getReports = asyncHandler(async (req: Request, res: Response) => {
   const { page = '1', limit = '20' } = req.query as { page?: string; limit?: string };
   const result = await adminService.getReports(parseInt(page), parseInt(limit));
   res.json({ success: true, data: result });
+});
+
+export const getUploadSignature = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { generateUploadSignature } = await import('../lib/cloudinary');
+  const sig = await generateUploadSignature('psynova/admin-photos', req.user!.userId);
+  res.json({ success: true, data: sig });
+});
+
+export const updateProfilePhoto = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { photoUrl, publicId } = req.body;
+  const admin = await adminService.updateProfilePhoto(req.user!.userId, photoUrl, publicId);
+  res.json({ success: true, data: admin });
 });

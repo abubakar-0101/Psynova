@@ -76,6 +76,21 @@ export const saveSessionNotes = asyncHandler(async (req: AuthRequest, res: Respo
   res.json({ success: true, data: updated });
 });
 
+export const getMyClients = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const result = await appointmentService.getMyClients(req.user!.userId);
+  res.json({ success: true, data: result });
+});
+
+export const getClientPayments = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const result = await appointmentService.getClientPayments(req.user!.userId);
+  res.json({ success: true, data: result });
+});
+
+export const getTherapistEarnings = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const result = await appointmentService.getTherapistEarnings(req.user!.userId);
+  res.json({ success: true, data: result });
+});
+
 export const stripeWebhook = asyncHandler(async (req: Request, res: Response) => {
   const { stripe } = await import('../lib/stripe');
   const sig = req.headers['stripe-signature'];

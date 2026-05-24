@@ -104,7 +104,7 @@ async function main() {
       bio: 'LMFT specializing in trauma-informed care for survivors of abuse and PTSD. EMDR-certified. I create a safe, non-judgmental space for healing at your own pace.',
       licenseNumber: 'LMFT-98765-CA',
       photoUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80&auto=format&fit=crop',
-      specializations: ['Trauma', 'PTSD', 'Grief', 'LGBTQ+'],
+      specializations: ['Trauma', 'PTSD', 'Grief'],
       languages: ['English', 'Mandarin'],
       sessionPrice: 140,
       yearsExperience: 9,

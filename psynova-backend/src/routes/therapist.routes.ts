@@ -26,6 +26,7 @@ router.get('/me/profile', authenticateToken, requireRole('THERAPIST'), therapist
 router.put('/me/profile', authenticateToken, requireRole('THERAPIST'), validate(updateTherapistProfileSchema), therapistController.updateMyProfile);
 router.post('/me/photo', authenticateToken, requireRole('THERAPIST'), therapistController.updateProfilePhoto);
 router.get('/me/upload-signature', authenticateToken, requireRole('THERAPIST'), therapistController.getUploadSignature);
+router.get('/me/earnings', authenticateToken, requireRole('THERAPIST'), therapistController.getMyEarnings);
 router.post('/me/availability', authenticateToken, requireRole('THERAPIST'), validate(availabilitySlotSchema), therapistController.addAvailabilitySlot);
 router.delete('/me/availability/:slotId', authenticateToken, requireRole('THERAPIST'), therapistController.removeAvailabilitySlot);
 

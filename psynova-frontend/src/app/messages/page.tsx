@@ -108,7 +108,7 @@ export default function MessagesPage() {
   useConversationSocket(activeConvId);
 
   // Load conversations
-  const { data: convsData } = useQuery({
+  const { data: convsData, isLoading: loadingConvs, isError: isConvsError, refetch: refetchConvs } = useQuery({
     queryKey: ['conversations'],
     queryFn: async () => {
       const res = await api.get('/api/messages/conversations');
@@ -122,7 +122,7 @@ export default function MessagesPage() {
   }, [convsData, setConversations]);
 
   // Load messages for active conversation
-  const { data: msgsData, isLoading: loadingMessages } = useQuery({
+  const { data: msgsData, isLoading: loadingMessages, isError: isMsgsError, refetch: refetchMsgs } = useQuery({
     queryKey: ['messages', activeConvId],
     queryFn: async () => {
       const res = await api.get(`/api/messages/conversations/${activeConvId}/messages`);
@@ -182,7 +182,16 @@ export default function MessagesPage() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-3 space-y-1">
-            {conversations.length === 0 ? (
+            {isConvsError ? (
+              <div className="text-center py-8 px-4 space-y-2">
+                <p className="text-xs text-[#E85D60]">Failed to load conversations</p>
+                <Button size="sm" variant="outline" className="h-8" onClick={() => refetchConvs()}>Retry</Button>
+              </div>
+            ) : loadingConvs ? (
+              <div className="text-center py-8 text-sm text-[#6B7280]">
+                Loading conversations...
+              </div>
+            ) : conversations.length === 0 ? (
               <p className="text-center text-sm text-[#6B7280] py-8">No conversations yet</p>
             ) : (
               conversations.map((conv) => (
@@ -240,7 +249,12 @@ export default function MessagesPage() {
                   </div>
                 ) : loadingMessages ? (
                   <div className="flex items-center justify-center h-full text-[#6B7280] text-sm">
-                    Loading...
+                    Loading messages...
+                  </div>
+                ) : isMsgsError ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center space-y-3">
+                    <p className="text-sm text-[#E85D60]">Failed to load messages</p>
+                    <Button size="sm" onClick={() => refetchMsgs()}>Retry</Button>
                   </div>
                 ) : (
                   activeMessages.map((msg) => (

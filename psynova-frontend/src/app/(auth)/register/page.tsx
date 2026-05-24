@@ -59,7 +59,7 @@ export default function RegisterPage() {
     }
   };
 
-  const inputClass = "flex h-11 w-full rounded-xl border border-[#F1F0EE] bg-white px-4 text-sm text-[#1A1A2E] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#4A90D9] focus:border-transparent transition-colors";
+  const inputClass = "flex h-11 w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] px-4 text-sm text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent transition-colors";
 
   return (
     <motion.div
@@ -74,7 +74,7 @@ export default function RegisterPage() {
         </CardHeader>
         <CardContent>
           {/* Role selector */}
-          <div className="grid grid-cols-2 gap-3 mb-6 rounded-2xl bg-[#F1F0EE] p-1">
+          <div className="grid grid-cols-2 gap-3 mb-6 rounded-2xl bg-[var(--subtle)] p-1">
             {(['CLIENT', 'THERAPIST'] as const).map((r) => (
               <button
                 key={r}
@@ -82,8 +82,8 @@ export default function RegisterPage() {
                 onClick={() => setValue('role', r)}
                 className={`py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   role === r
-                    ? 'bg-white text-[#4A90D9] shadow-sm'
-                    : 'text-[#6B7280] hover:text-[#1A1A2E]'
+                    ? 'bg-[var(--surface)] text-[var(--brand)] shadow-sm'
+                    : 'text-[var(--muted-fg)] hover:text-[var(--fg)]'
                 }`}
               >
                 {r === 'CLIENT' ? 'I\'m a Client' : 'I\'m a Therapist'}
@@ -94,25 +94,25 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-[#1A1A2E] mb-1 block">First Name</label>
+                <label className="text-xs font-medium text-[var(--fg)] mb-1 block">First Name</label>
                 <input type="text" placeholder="Jane" className={inputClass} {...register('firstName')} />
-                {errors.firstName && <p className="mt-1 text-xs text-[#E85D60]">{errors.firstName.message}</p>}
+                {errors.firstName && <p className="mt-1 text-xs text-[var(--danger)]">{errors.firstName.message}</p>}
               </div>
               <div>
-                <label className="text-xs font-medium text-[#1A1A2E] mb-1 block">Last Name</label>
+                <label className="text-xs font-medium text-[var(--fg)] mb-1 block">Last Name</label>
                 <input type="text" placeholder="Doe" className={inputClass} {...register('lastName')} />
-                {errors.lastName && <p className="mt-1 text-xs text-[#E85D60]">{errors.lastName.message}</p>}
+                {errors.lastName && <p className="mt-1 text-xs text-[var(--danger)]">{errors.lastName.message}</p>}
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-medium text-[#1A1A2E] mb-1 block">Email</label>
+              <label className="text-xs font-medium text-[var(--fg)] mb-1 block">Email</label>
               <input type="email" placeholder="you@example.com" className={inputClass} {...register('email')} />
-              {errors.email && <p className="mt-1 text-xs text-[#E85D60]">{errors.email.message}</p>}
+              {errors.email && <p className="mt-1 text-xs text-[var(--danger)]">{errors.email.message}</p>}
             </div>
 
             <div>
-              <label className="text-xs font-medium text-[#1A1A2E] mb-1 block">Password</label>
+              <label className="text-xs font-medium text-[var(--fg)] mb-1 block">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -123,12 +123,12 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5 text-[#6B7280]"
+                  className="absolute right-3 top-3.5 text-[var(--muted-fg)]"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && <p className="mt-1 text-xs text-[#E85D60]">{errors.password.message}</p>}
+              {errors.password && <p className="mt-1 text-xs text-[var(--danger)]">{errors.password.message}</p>}
             </div>
 
             <Button type="submit" className="w-full mt-2" isLoading={registerPending}>
@@ -136,16 +136,16 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="mt-4 text-xs text-center text-[#6B7280]">
+          <p className="mt-4 text-xs text-center text-[var(--muted-fg)]">
             By signing up, you agree to our{' '}
-            <Link href="/terms" className="text-[#4A90D9] hover:underline">Terms</Link>{' '}
+            <Link href="/terms" className="text-[var(--brand)] hover:underline">Terms</Link>{' '}
             and{' '}
-            <Link href="/privacy" className="text-[#4A90D9] hover:underline">Privacy Policy</Link>.
+            <Link href="/privacy" className="text-[var(--brand)] hover:underline">Privacy Policy</Link>.
           </p>
 
-          <p className="mt-3 text-center text-sm text-[#6B7280]">
+          <p className="mt-3 text-center text-sm text-[var(--muted-fg)]">
             Already have an account?{' '}
-            <Link href="/login" className="text-[#4A90D9] font-medium hover:underline">Sign in</Link>
+            <Link href="/login" className="text-[var(--brand)] font-medium hover:underline">Sign in</Link>
           </p>
         </CardContent>
       </Card>

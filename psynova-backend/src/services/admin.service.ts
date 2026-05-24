@@ -11,6 +11,7 @@ export async function getMe(userId: string) {
       email: true,
       firstName: true,
       lastName: true,
+      photoUrl: true,
       role: true,
       isVerified: true,
       isActive: true,
@@ -98,17 +99,21 @@ export async function getDashboardStats() {
   };
 }
 
-export async function getAllUsers(page: number, limit: number, search?: string) {
+export async function getAllUsers(page: number, limit: number, search?: string, role?: string) {
   const skip = (page - 1) * limit;
-  const where = search
-    ? {
-        OR: [
-          { email: { contains: search, mode: 'insensitive' as const } },
-          { firstName: { contains: search, mode: 'insensitive' as const } },
-          { lastName: { contains: search, mode: 'insensitive' as const } },
-        ],
-      }
-    : {};
+  const where: any = {};
+
+  if (search) {
+    where.OR = [
+      { email: { contains: search, mode: 'insensitive' as const } },
+      { firstName: { contains: search, mode: 'insensitive' as const } },
+      { lastName: { contains: search, mode: 'insensitive' as const } },
+    ];
+  }
+
+  if (role && role !== 'ALL') {
+    where.role = role;
+  }
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
@@ -181,4 +186,22 @@ export async function getReports(page: number, limit: number) {
   ]);
 
   return { reports, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+}
+
+export async function updateProfilePhoto(userId: string, photoUrl: string, publicId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } }) as any;
+  if (!user) throw new AppError('User not found', 404);
+  if (user.role !== 'ADMIN') throw new AppError('Not an admin account', 403);
+
+  if (user.cloudinaryPublicId) {
+    const { deleteCloudinaryAsset } = await import('../lib/cloudinary');
+    await deleteCloudinaryAsset(user.cloudinaryPublicId);
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { photoUrl, cloudinaryPublicId: publicId },
+  });
+
+  return getMe(userId);
 }

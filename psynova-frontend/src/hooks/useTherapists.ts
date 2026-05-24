@@ -36,7 +36,8 @@ export function useTherapistAvailability(therapistId: string) {
     queryKey: ['therapists', therapistId, 'availability'],
     queryFn: async () => {
       const res = await api.get(`/api/therapists/${therapistId}/availability`);
-      return res.data.data as AvailabilitySlot[];
+      const data = res.data.data;
+      return (Array.isArray(data) ? data : data?.slots ?? []) as AvailabilitySlot[];
     },
     enabled: !!therapistId,
   });

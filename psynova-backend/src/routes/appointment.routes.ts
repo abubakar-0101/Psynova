@@ -33,6 +33,8 @@ router.post(
 
 router.get('/upcoming', authenticateToken, appointmentController.getUpcomingAppointments);
 router.get('/history', authenticateToken, appointmentController.getAppointmentHistory);
+router.get('/my-clients', authenticateToken, requireRole('THERAPIST'), appointmentController.getMyClients);
+router.get('/payments', authenticateToken, requireRole('CLIENT'), appointmentController.getClientPayments);
 
 router.get(
   '/by-session/:sessionId',

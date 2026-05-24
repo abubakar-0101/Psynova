@@ -5,50 +5,76 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQueryClient } from '@tanstack/react-query';
-import { Shield, KeyRound, Camera, Loader2 } from 'lucide-react';
+import { Camera, Loader2, KeyRound, BookOpen } from 'lucide-react';
 import { DashboardShell } from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/toaster';
-import { getInitials, formatDate } from '@/lib/utils';
+import { getInitials } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
-import { adminNav } from '../_nav';
-import { useAdminMe, useUpdateAdminMe } from '@/hooks/useAdmin';
 import api from '@/lib/axios';
 
-const profileSchema = z
-  .object({
-    firstName: z.string().min(1, 'First name required').max(50),
-    lastName: z.string().min(1, 'Last name required').max(50),
-    email: z.string().email('Invalid email'),
-    currentPassword: z.string().optional(),
-    newPassword: z
-      .string()
-      .optional()
-      .refine(
-        (v) => !v || (v.length >= 8 && /[A-Z]/.test(v) && /[0-9]/.test(v)),
-        { message: 'Min 8 chars, uppercase + number' },
-      ),
-  })
-  .refine((d) => !d.newPassword || (d.currentPassword && d.currentPassword.length > 0), {
-    message: 'Current password required to change password',
-    path: ['currentPassword'],
-  });
+const clientNav = [
+  { href: '/dashboard/client', label: 'Overview', icon: '📊' as const },
+  { href: '/dashboard/client/sessions', label: 'My Sessions', icon: '📅' as const },
+  { href: '/messages', label: 'Messages', icon: '💬' as const },
+  { href: '/dashboard/client/mood', label: 'Mood Tracker', icon: '❤️' as const },
+  { href: '/dashboard/client/journal', label: 'Journal', icon: '📝' as const },
+  { href: '/dashboard/client/profile', label: 'Profile', icon: '👤' as const },
+];
+
+const profileSchema = z.object({
+  firstName: z.string().min(1, 'First name required').max(50),
+  lastName: z.string().min(1, 'Last name required').max(50),
+  email: z.string().email('Invalid email'),
+  bio: z.string().max(500, 'Bio must be under 500 characters').optional(),
+  currentPassword: z.string().optional(),
+  newPassword: z
+    .string()
+    .optional()
+    .refine(
+      (v) => !v || (v.length >= 8 && /[A-Z]/.test(v) && /[0-9]/.test(v)),
+      { message: 'Min 8 chars, uppercase + number' },
+    ),
+})
+.refine((d) => !d.newPassword || (d.currentPassword && d.currentPassword.length > 0), {
+  message: 'Current password required to change password',
+  path: ['currentPassword'],
+});
 
 type ProfileForm = z.infer<typeof profileSchema>;
 
-const inputClass =
-  'flex h-11 w-full rounded-xl border border-[#F1F0EE] bg-white px-4 text-sm text-[#1A1A2E] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#4A90D9] transition-colors';
+const inputClass = 'flex h-11 w-full rounded-xl border border-[#F1F0EE] bg-white px-4 text-sm text-[#1A1A2E] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#4A90D9] transition-colors';
 
-export default function AdminProfilePage() {
-  const { data: profile, isLoading } = useAdminMe();
+export default function ClientProfilePage() {
   const { user, setUser } = useAuthStore();
-  const update = useUpdateAdminMe();
   const qc = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photoUploading, setPhotoUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ProfileForm>({
+    resolver: zodResolver(profileSchema),
+  });
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        bio: user.bio || '',
+        currentPassword: '',
+        newPassword: '',
+      });
+    }
+  }, [user, reset]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,7 +91,7 @@ export default function AdminProfilePage() {
 
     setPhotoUploading(true);
     try {
-      const sigRes = await api.get('/api/admin/me/upload-signature');
+      const sigRes = await api.get('/api/clients/me/upload-signature');
       const { signature, timestamp, cloudName, apiKey, folder } = sigRes.data.data;
 
       const form = new FormData();
@@ -82,7 +108,7 @@ export default function AdminProfilePage() {
       if (!uploadRes.ok) throw new Error('Cloudinary upload failed');
       const uploaded = await uploadRes.json();
 
-      const saveRes = await api.post('/api/admin/me/photo', {
+      const saveRes = await api.post('/api/clients/me/photo', {
         photoUrl: uploaded.secure_url,
         publicId: uploaded.public_id,
       });
@@ -107,58 +133,45 @@ export default function AdminProfilePage() {
     }
   };
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ProfileForm>({
-    resolver: zodResolver(profileSchema),
-  });
-
-  useEffect(() => {
-    if (profile) {
-      reset({
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        email: profile.email,
-        currentPassword: '',
-        newPassword: '',
-      });
-    }
-  }, [profile, reset]);
-
   const onSubmit = async (data: ProfileForm) => {
-    const payload: Record<string, string> = {};
-    if (data.firstName !== profile?.firstName) payload.firstName = data.firstName;
-    if (data.lastName !== profile?.lastName) payload.lastName = data.lastName;
-    if (data.email !== profile?.email) payload.email = data.email;
-    if (data.newPassword) {
-      payload.newPassword = data.newPassword;
-      payload.currentPassword = data.currentPassword ?? '';
-    }
-
-    if (Object.keys(payload).length === 0) {
-      toast({ title: 'Nothing to update', variant: 'default' });
-      return;
-    }
-
+    setIsSubmitting(true);
     try {
-      await update.mutateAsync(payload);
-      toast({ title: 'Profile updated', variant: 'success' });
+      const payload: Record<string, string> = {};
+      if (data.firstName !== user?.firstName) payload.firstName = data.firstName;
+      if (data.lastName !== user?.lastName) payload.lastName = data.lastName;
+      if (data.email !== user?.email) payload.email = data.email;
+      if (data.bio !== (user?.bio || '')) payload.bio = data.bio || '';
+      if (data.newPassword) {
+        payload.newPassword = data.newPassword;
+        payload.currentPassword = data.currentPassword ?? '';
+      }
+
+      if (Object.keys(payload).length === 0) {
+        toast({ title: 'No changes to save', variant: 'default' });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const res = await api.put('/api/clients/me', payload);
+      setUser(res.data.data);
+      toast({ title: 'Profile updated successfully', variant: 'success' });
       reset((current) => ({ ...current, currentPassword: '', newPassword: '' }));
+      qc.invalidateQueries({ queryKey: ['auth', 'me'] });
     } catch (err: any) {
       toast({
         title: 'Update failed',
         description: err?.response?.data?.message || 'Please try again',
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <DashboardShell navItems={adminNav} title="Admin Profile">
+    <DashboardShell navItems={clientNav} title="My Profile">
       <div className="max-w-2xl space-y-5">
+        {/* Profile Photo */}
         <Card>
           <CardHeader><CardTitle>Profile Photo</CardTitle></CardHeader>
           <CardContent>
@@ -167,7 +180,7 @@ export default function AdminProfilePage() {
                 {user?.photoUrl ? (
                   <Image
                     src={user.photoUrl}
-                    alt={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'Admin'}
+                    alt={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'Profile'}
                     fill
                     sizes="96px"
                     className="rounded-2xl object-cover"
@@ -217,51 +230,22 @@ export default function AdminProfilePage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarFallback className="text-lg bg-[#4A90D9]/10 text-[#4A90D9]">
-                  {profile ? getInitials(profile.firstName, profile.lastName) : '...'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h2 className="text-lg font-semibold text-[#1A1A2E] truncate">
-                    {profile ? `${profile.firstName} ${profile.lastName}` : 'Loading...'}
-                  </h2>
-                  <Badge variant="warning" className="flex items-center gap-1">
-                    <Shield className="h-3 w-3" /> Admin
-                  </Badge>
-                </div>
-                <p className="text-xs text-[#6B7280]">{profile?.email}</p>
-                {profile && (
-                  <p className="text-xs text-[#6B7280] mt-0.5">
-                    Member since {formatDate(profile.createdAt)}
-                  </p>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Account Information */}
           <Card>
-            <CardHeader>
-              <CardTitle>Account Information</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle>Account Information</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium text-[#1A1A2E] mb-1 block">First Name</label>
-                  <input {...register('firstName')} className={inputClass} disabled={isLoading} />
+                  <input {...register('firstName')} className={inputClass} />
                   {errors.firstName && (
                     <p className="mt-1 text-xs text-[#E85D60]">{errors.firstName.message}</p>
                   )}
                 </div>
                 <div>
                   <label className="text-xs font-medium text-[#1A1A2E] mb-1 block">Last Name</label>
-                  <input {...register('lastName')} className={inputClass} disabled={isLoading} />
+                  <input {...register('lastName')} className={inputClass} />
                   {errors.lastName && (
                     <p className="mt-1 text-xs text-[#E85D60]">{errors.lastName.message}</p>
                   )}
@@ -269,12 +253,7 @@ export default function AdminProfilePage() {
               </div>
               <div>
                 <label className="text-xs font-medium text-[#1A1A2E] mb-1 block">Email</label>
-                <input
-                  type="email"
-                  {...register('email')}
-                  className={inputClass}
-                  disabled={isLoading}
-                />
+                <input type="email" {...register('email')} className={inputClass} />
                 {errors.email && (
                   <p className="mt-1 text-xs text-[#E85D60]">{errors.email.message}</p>
                 )}
@@ -282,6 +261,31 @@ export default function AdminProfilePage() {
             </CardContent>
           </Card>
 
+          {/* Bio/About */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-[#6B7280]" />
+                About You
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <label className="text-xs font-medium text-[#1A1A2E] mb-1 block">
+                Bio <span className="text-[#6B7280]">(optional)</span>
+              </label>
+              <textarea
+                {...register('bio')}
+                rows={4}
+                placeholder="Tell us a bit about yourself or any health goals you're working towards..."
+                className="w-full rounded-xl border border-[#F1F0EE] bg-white px-4 py-3 text-sm text-[#1A1A2E] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#4A90D9] resize-none"
+              />
+              {errors.bio && (
+                <p className="mt-1 text-xs text-[#E85D60]">{errors.bio.message}</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Password Change */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -326,7 +330,7 @@ export default function AdminProfilePage() {
             </CardContent>
           </Card>
 
-          <Button type="submit" className="w-full" isLoading={update.isPending}>
+          <Button type="submit" className="w-full" isLoading={isSubmitting}>
             Save Changes
           </Button>
         </form>

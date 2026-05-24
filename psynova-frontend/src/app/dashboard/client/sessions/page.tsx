@@ -47,18 +47,21 @@ export default function ClientSessionsPage() {
   };
 
   const AppointmentCard = ({ apt }: { apt: any }) => (
-    <div className="flex items-center gap-4 p-4 rounded-2xl border border-[#F1F0EE] bg-white hover:shadow-sm transition-shadow">
+    <div
+      className="flex items-center gap-4 p-4 rounded-2xl border hover:shadow-sm transition-shadow"
+      style={{ borderColor: 'var(--dash-border)', background: 'var(--dash-surface)' }}
+    >
       <Avatar className="h-12 w-12 flex-shrink-0">
-        <AvatarFallback>
+        <AvatarFallback className="text-white bg-brand-gradient">
           {getInitials(apt.therapistUser.firstName, apt.therapistUser.lastName)}
         </AvatarFallback>
       </Avatar>
 
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-[#1A1A2E]">
+        <p className="font-semibold" style={{ color: 'var(--dash-text)' }}>
           {apt.therapistUser.firstName} {apt.therapistUser.lastName}
         </p>
-        <div className="flex items-center gap-3 text-xs text-[#6B7280] mt-0.5">
+        <div className="flex items-center gap-3 text-xs mt-0.5" style={{ color: 'var(--dash-muted)' }}>
           <span className="flex items-center gap-1">
             <Calendar className="h-3 w-3" /> {formatDate(apt.startTime)}
           </span>
@@ -90,7 +93,8 @@ export default function ClientSessionsPage() {
           <Button
             size="sm"
             variant="ghost"
-            className="text-[#E85D60] hover:text-[#E85D60] hover:bg-red-50 gap-1"
+            className="text-[#E85D60] hover:text-[#E85D60] gap-1"
+            style={{ '--tw-ring-color': 'transparent' } as any}
             onClick={() => handleCancel(apt.id)}
             isLoading={cancelMutation.isPending}
           >
@@ -105,14 +109,20 @@ export default function ClientSessionsPage() {
     <DashboardShell navItems={clientNav} title="My Sessions">
       <div className="space-y-5">
         {/* Tabs */}
-        <div className="flex gap-1 w-fit rounded-xl bg-[#F1F0EE] p-1">
+        <div
+          className="flex gap-1 w-fit rounded-xl p-1"
+          style={{ background: 'var(--subtle)' }}
+        >
           {(['upcoming', 'history'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium capitalize transition-all ${
-                tab === t ? 'bg-white text-[#1A1A2E] shadow-sm' : 'text-[#6B7280]'
-              }`}
+              className="rounded-lg px-4 py-1.5 text-sm font-medium capitalize transition-all"
+              style={{
+                background: tab === t ? 'var(--dash-surface)' : 'transparent',
+                color: tab === t ? 'var(--dash-text)' : 'var(--dash-muted)',
+                boxShadow: tab === t ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+              }}
             >
               {t}
             </button>
@@ -122,9 +132,9 @@ export default function ClientSessionsPage() {
         {tab === 'upcoming' ? (
           <div className="space-y-3">
             {loadingUpcoming ? (
-              <p className="text-[#6B7280] text-sm">Loading...</p>
+              <p className="text-sm" style={{ color: 'var(--dash-muted)' }}>Loading...</p>
             ) : upcoming.length === 0 ? (
-              <div className="text-center py-12 text-[#6B7280]">
+              <div className="text-center py-12" style={{ color: 'var(--dash-muted)' }}>
                 <p className="font-medium mb-2">No upcoming sessions</p>
                 <Button asChild><Link href="/search">Find a Therapist</Link></Button>
               </div>
@@ -135,9 +145,9 @@ export default function ClientSessionsPage() {
         ) : (
           <div className="space-y-3">
             {loadingHistory ? (
-              <p className="text-[#6B7280] text-sm">Loading...</p>
+              <p className="text-sm" style={{ color: 'var(--dash-muted)' }}>Loading...</p>
             ) : history.length === 0 ? (
-              <div className="text-center py-12 text-[#6B7280]">
+              <div className="text-center py-12" style={{ color: 'var(--dash-muted)' }}>
                 <p className="font-medium">No past sessions</p>
               </div>
             ) : (

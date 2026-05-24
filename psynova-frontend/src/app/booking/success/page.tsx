@@ -96,7 +96,11 @@ function BookingSuccessInner() {
               </div>
               <div className="flex justify-between">
                 <span className="text-[#6B7280]">Duration</span>
-                <span className="font-medium text-[#1A1A2E]">50 minutes</span>
+                <span className="font-medium text-[#1A1A2E]">
+                  {data.startTime && data.endTime
+                    ? `${Math.round((new Date(data.endTime).getTime() - new Date(data.startTime).getTime()) / 60000)} minutes`
+                    : '50 minutes'}
+                </span>
               </div>
             </div>
           </div>

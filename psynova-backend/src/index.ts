@@ -14,6 +14,7 @@ import messageRoutes from './routes/message.routes';
 import notificationRoutes from './routes/notification.routes';
 import moodRoutes from './routes/mood.routes';
 import adminRoutes from './routes/admin.routes';
+import clientRoutes from './routes/client.routes';
 import { stripeWebhook } from './controllers/appointment.controller';
 import { errorHandler } from './middleware/errorHandler';
 import { initializeSocket } from './lib/socket';
@@ -76,6 +77,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/wellness', moodRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/clients', clientRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {

@@ -11,7 +11,7 @@ import { useTherapists } from '@/hooks/useTherapists';
 import { TherapistProfile } from '@/types';
 
 const SPECIALIZATIONS = [
-  'Anxiety', 'Depression', 'Trauma & PTSD', 'Couples Therapy', 'LGBTQ+',
+  'Anxiety', 'Depression', 'Trauma & PTSD', 'Couples Therapy',
   'Family Issues', 'ADHD', 'Grief', 'Stress', 'Addiction', 'Eating Disorders', 'OCD',
 ];
 
@@ -93,9 +93,28 @@ function SearchPageInner() {
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
           <div className="flex gap-6">
+            {/* Sidebar Filters Backdrop for mobile */}
+            {filterOpen && (
+              <div
+                className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
+                onClick={() => setFilterOpen(false)}
+              />
+            )}
             {/* Sidebar Filters */}
-            <aside className={`w-64 flex-shrink-0 ${filterOpen ? 'block' : 'hidden lg:block'}`}>
-              <div className="rounded-2xl border border-[#F1F0EE] bg-white p-5 sticky top-24 space-y-6">
+            <aside
+              className={`flex-shrink-0 lg:w-64 lg:static lg:z-auto transition-all duration-300
+                ${filterOpen
+                  ? 'fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-[#F1F0EE] p-5 pb-16 shadow-2xl overflow-y-auto lg:p-0 lg:shadow-none lg:border-0 lg:bg-transparent lg:block'
+                  : 'hidden lg:block'
+                }`}
+            >
+              <div className="flex items-center justify-between lg:hidden mb-4 border-b border-[#F1F0EE] pb-3">
+                <h3 className="font-semibold text-[#1A1A2E]">Filters</h3>
+                <button onClick={() => setFilterOpen(false)} className="p-1 hover:bg-[#F1F0EE] rounded-lg">
+                  <X className="h-5 w-5 text-[#6B7280]" />
+                </button>
+              </div>
+              <div className="space-y-6 border-0 bg-transparent p-0 static lg:border lg:border-[#F1F0EE] lg:bg-white lg:rounded-2xl lg:p-5 lg:pb-12 lg:sticky lg:top-24">
                 <div>
                   <h3 className="text-sm font-semibold text-[#1A1A2E] mb-3">Specialization</h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">

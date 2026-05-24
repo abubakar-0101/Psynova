@@ -66,6 +66,9 @@ model User {
   role         Role     @default(CLIENT)
   firstName    String
   lastName     String
+  bio          String?  @db.Text
+  photoUrl     String?
+  cloudinaryPublicId String?
   isVerified   Boolean  @default(false)
   isActive     Boolean  @default(true)
   verifyToken  String?

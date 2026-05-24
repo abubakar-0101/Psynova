@@ -63,43 +63,43 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-[#1A1A2E] mb-1.5 block">Email</label>
+              <label className="text-sm font-medium text-[var(--fg)] mb-1.5 block">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3.5 h-4 w-4 text-[#6B7280]" />
+                <Mail className="absolute left-3 top-3.5 h-4 w-4 text-[var(--muted-fg)]" />
                 <input
                   type="email"
                   placeholder="you@example.com"
-                  className="flex h-11 w-full rounded-xl border border-[#F1F0EE] bg-white pl-10 pr-4 text-sm text-[#1A1A2E] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#4A90D9] focus:border-transparent transition-colors"
+                  className="flex h-11 w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] pl-10 pr-4 text-sm text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent transition-colors"
                   {...register('email')}
                 />
               </div>
-              {errors.email && <p className="mt-1 text-xs text-[#E85D60]">{errors.email.message}</p>}
+              {errors.email && <p className="mt-1 text-xs text-[var(--danger)]">{errors.email.message}</p>}
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-[#1A1A2E]">Password</label>
-                <Link href="/forgot-password" className="text-xs text-[#4A90D9] hover:underline">
+                <label className="text-sm font-medium text-[var(--fg)]">Password</label>
+                <Link href="/forgot-password" className="text-xs text-[var(--brand)] hover:underline">
                   Forgot password?
                 </Link>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-3.5 h-4 w-4 text-[#6B7280]" />
+                <Lock className="absolute left-3 top-3.5 h-4 w-4 text-[var(--muted-fg)]" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
-                  className="flex h-11 w-full rounded-xl border border-[#F1F0EE] bg-white pl-10 pr-10 text-sm text-[#1A1A2E] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#4A90D9] focus:border-transparent transition-colors"
+                  className="flex h-11 w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] pl-10 pr-10 text-sm text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent transition-colors"
                   {...register('password')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5 text-[#6B7280] hover:text-[#1A1A2E]"
+                  className="absolute right-3 top-3.5 text-[var(--muted-fg)] hover:text-[var(--fg)]"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && <p className="mt-1 text-xs text-[#E85D60]">{errors.password.message}</p>}
+              {errors.password && <p className="mt-1 text-xs text-[var(--danger)]">{errors.password.message}</p>}
             </div>
 
             <Button type="submit" className="w-full mt-2" isLoading={loginPending}>
@@ -107,17 +107,19 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-[#6B7280]">
+          <div className="mt-6 text-center text-sm text-[var(--muted-fg)]">
             Don't have an account?{' '}
-            <Link href="/register" className="text-[#4A90D9] font-medium hover:underline">
+            <Link href="/register" className="text-[var(--brand)] font-medium hover:underline">
               Create one free
             </Link>
           </div>
 
-          <div className="mt-4 rounded-xl bg-[#F1F0EE] p-3 text-xs text-[#6B7280]">
-            <strong className="text-[#1A1A2E]">Demo:</strong> client@psynova.com / Demo1234! &nbsp;|&nbsp;
-            therapist@psynova.com / Demo1234!
-          </div>
+          {process.env.NEXT_PUBLIC_DEMO_MODE === 'true' && (
+            <div className="mt-4 rounded-xl bg-[var(--subtle)] p-3 text-xs text-[var(--muted-fg)]">
+              <strong className="text-[var(--fg)]">Demo:</strong> client@psynova.com / Demo1234! &nbsp;|&nbsp;
+              therapist@psynova.com / Demo1234!
+            </div>
+          )}
         </CardContent>
       </Card>
     </motion.div>

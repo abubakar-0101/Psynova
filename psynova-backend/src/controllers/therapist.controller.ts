@@ -49,3 +49,9 @@ export const getUploadSignature = asyncHandler(async (req: AuthRequest, res: Res
   const sig = await generateUploadSignature('psynova/therapist-photos', req.user!.userId);
   res.json({ success: true, data: sig });
 });
+
+export const getMyEarnings = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { getTherapistEarnings } = await import('../services/appointment.service');
+  const result = await getTherapistEarnings(req.user!.userId);
+  res.json({ success: true, data: result });
+});

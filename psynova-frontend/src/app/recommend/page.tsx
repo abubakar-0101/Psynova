@@ -37,7 +37,6 @@ const QUESTIONS: Question[] = [
       { value: 'Trauma', label: 'Trauma / PTSD', emoji: '🛡️', description: 'Working through past experiences' },
       { value: 'Relationships', label: 'Relationships', emoji: '💞', description: 'Couples, family, or interpersonal' },
       { value: 'Stress', label: 'Stress & burnout', emoji: '🔥', description: 'Overwhelm at work or in life' },
-      { value: 'LGBTQ+', label: 'Identity & LGBTQ+', emoji: '🏳️‍🌈', description: 'Identity, coming out, affirming care' },
       { value: 'Grief', label: 'Grief & loss', emoji: '🕊️', description: 'Processing the loss of someone' },
       { value: 'ADHD', label: 'ADHD & focus', emoji: '⚡', description: 'Attention, motivation, executive function' },
     ],
@@ -99,7 +98,6 @@ const CONCERN_SPECS: Record<string, string[]> = {
   Trauma: ['Trauma', 'Trauma & PTSD', 'PTSD'],
   Relationships: ['Couples', 'Couples Therapy', 'Family Issues', 'Relationships'],
   Stress: ['Stress'],
-  'LGBTQ+': ['LGBTQ+'],
   Grief: ['Grief'],
   ADHD: ['ADHD'],
 };
@@ -254,7 +252,7 @@ export default function RecommendPage() {
               <>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {matches!.map(({ therapist, score }, i) => (
-                    <div key={therapist.id} className="relative">
+                    <div key={therapist.id} className="relative h-full">
                       {i < 3 && (
                         <div className="absolute -top-2 -left-2 z-10 rounded-full bg-[#4A90D9] text-white text-xs font-bold px-3 py-1 shadow-md">
                           {i === 0 ? '🏆 Top match' : `#${i + 1} match`}

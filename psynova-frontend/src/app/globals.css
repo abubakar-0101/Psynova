@@ -4,16 +4,16 @@
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-fraunces), 'Inter', system-ui, sans-serif;
 
-  /* ---- Legacy Psynova design tokens (still referenced by dashboard pages) ---- */
-  --color-primary: #4A90D9;
-  --color-primary-dark: #3a7ac9;
-  --color-sage: #7BAE9E;
-  --color-sage-dark: #6a9d8d;
-  --color-warm-white: #FAFAF9;
-  --color-light-gray: #F1F0EE;
-  --color-dark-text: #1A1A2E;
-  --color-muted: #6B7280;
-  --color-error: #E85D60;
+  /* ---- Legacy Psynova design tokens (mapped dynamically to modern variables) ---- */
+  --color-primary: var(--brand);
+  --color-primary-dark: var(--brand-accent);
+  --color-sage: var(--success);
+  --color-sage-dark: var(--success);
+  --color-warm-white: var(--bg);
+  --color-light-gray: var(--subtle);
+  --color-dark-text: var(--fg);
+  --color-muted: var(--muted-fg);
+  --color-error: var(--danger);
 
   /* ---- New v2 semantic tokens (theme-aware via :root / .dark below) ---- */
   --color-background: var(--bg);
@@ -40,13 +40,13 @@
 
 /* ============== LIGHT (default) ============== */
 :root {
-  --bg: #FAFAF9;
-  --fg: #0B0B14;
+  --bg: #F8FAFC;
+  --fg: #0F172A;
   --surface: #FFFFFF;
   --surface-elevated: #FFFFFF;
-  --subtle: #F4F4F2;
-  --border-subtle: rgba(15, 17, 23, 0.08);
-  --muted-fg: #6B7280;
+  --subtle: #F1F5F9;
+  --border-subtle: rgba(99, 102, 241, 0.08);
+  --muted-fg: #64748B;
 
   /* Brand: indigo -> violet -> pink mesh */
   --brand: #6366F1;
@@ -65,34 +65,59 @@
   /* Legacy alias for body background (used by old layout.tsx className) */
   --background: var(--bg);
   --foreground: var(--fg);
+  
+  /* Light legacy dashboard tokens */
+  --dash-bg: #F8FAFC;
+  --dash-surface: #FFFFFF;
+  --dash-border: rgba(99, 102, 241, 0.08);
+  --dash-text: #0F172A;
+  --dash-muted: #64748B;
+  --dash-active-bg: rgba(99, 102, 241, 0.06);
+  --dash-active-text: #6366F1;
+  --dash-hover: rgba(99, 102, 241, 0.03);
+
   color-scheme: light;
 }
 
-/* ============== DARK ============== */
+/* ============== DARK — deep navy/indigo (matches screenshot) ============== */
 .dark {
-  --bg: #07080C;
-  --fg: #ECEDEE;
-  --surface: #0F1117;
-  --surface-elevated: #14171F;
-  --subtle: #1B1F2A;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --muted-fg: #9BA1AB;
+  /* Page & surface backgrounds — navy indigo, NOT black */
+  --bg: #0E0F1A;
+  --fg: #E8EAF0;
+  --surface: #14162A;
+  --surface-elevated: #1A1D35;
+  --subtle: #1E2238;
+  --border-subtle: rgba(130, 140, 255, 0.12);
+  --muted-fg: #8B93B8;
 
-  --brand: #818CF8;
-  --brand-from: #818CF8;
-  --brand-to: #F472B6;
-  --brand-accent: #C084FC;
+  /* Brand: indigo → violet (same hue family as the bg so it feels cohesive) */
+  --brand: #7C83F5;
+  --brand-from: #6366F1;
+  --brand-to: #A855F7;
+  --brand-accent: #818CF8;
 
   --success: #34D399;
   --danger: #F87171;
   --warning: #FBBF24;
 
-  --glass-bg: rgba(20, 23, 31, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(20, 22, 42, 0.65);
+  --glass-border: rgba(130, 140, 255, 0.15);
+  --glass-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.6);
 
+  /* Legacy alias — dashboard still references --background */
   --background: var(--bg);
   --foreground: var(--fg);
+
+  /* Legacy dashboard token overrides so hardcoded refs pick up dark colors */
+  --dash-bg: #0E0F1A;
+  --dash-surface: #14162A;
+  --dash-border: rgba(130, 140, 255, 0.12);
+  --dash-text: #E8EAF0;
+  --dash-muted: #8B93B8;
+  --dash-active-bg: rgba(99, 102, 241, 0.15);
+  --dash-active-text: #818CF8;
+  --dash-hover: rgba(130, 140, 255, 0.08);
+
   color-scheme: dark;
 }
 
@@ -206,3 +231,50 @@ body {
   background: var(--brand);
   color: #fff;
 }
+
+/* ---- Dark mode mesh — richer navy/indigo tones ---- */
+.dark .bg-brand-mesh {
+  background:
+    radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.28) 0px, transparent 55%),
+    radial-gradient(at 85% 15%, rgba(139, 92, 246, 0.22) 0px, transparent 55%),
+    radial-gradient(at 50% 85%, rgba(99, 102, 241, 0.18) 0px, transparent 50%),
+    radial-gradient(at 75% 60%, rgba(168, 85, 247, 0.15) 0px, transparent 45%);
+}
+
+/* ---- Legacy color shim — maps hardcoded dashboard hex values to theme vars ----
+   Applies only inside dark mode so light mode is unaffected. */
+.dark {
+  /* Any element whose text was hardcoded to the dark text color becomes fg */
+  --color-dark-text: var(--fg);
+  /* Any element whose text was muted gray becomes muted-fg */
+  --color-muted: var(--muted-fg);
+  /* Light-gray backgrounds become subtle */
+  --color-light-gray: var(--subtle);
+  /* Warm-white page bg becomes dark bg */
+  --color-warm-white: var(--bg);
+}
+
+/* Dashboard pages: override tailwind inline color refs via CSS cascade */
+.dark .text-\[\#1A1A2E\],
+.dark [class*="text-[#1A1A2E]"] { color: var(--fg) !important; }
+
+.dark .text-\[\#6B7280\],
+.dark [class*="text-[#6B7280]"] { color: var(--muted-fg) !important; }
+
+.dark .bg-white,
+.dark [class*="bg-white"]:not([class*="bg-white/"]) { background-color: var(--surface) !important; }
+
+.dark .bg-\[\#FAFAF9\],
+.dark [class*="bg-[#FAFAF9]"] { background-color: var(--bg) !important; }
+
+.dark .border-\[\#F1F0EE\],
+.dark [class*="border-[#F1F0EE]"] { border-color: var(--border-subtle) !important; }
+
+.dark .bg-\[\#F1F0EE\],
+.dark [class*="bg-[#F1F0EE]"] { background-color: var(--subtle) !important; }
+
+.dark .hover\:bg-\[\#F1F0EE\]:hover,
+.dark [class*="hover:bg-[#F1F0EE]"]:hover { background-color: var(--subtle) !important; }
+
+.dark .hover\:text-\[\#1A1A2E\]:hover,
+.dark [class*="hover:text-[#1A1A2E]"]:hover { color: var(--fg) !important; }

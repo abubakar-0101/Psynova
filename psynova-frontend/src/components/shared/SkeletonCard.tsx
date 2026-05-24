@@ -2,25 +2,33 @@ import { cn } from '@/lib/utils';
 
 function Skeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('animate-pulse rounded-xl bg-[#F1F0EE]', className)} />
+    <div
+      className={cn('animate-pulse rounded-xl', className)}
+      style={{ background: 'var(--subtle)' }}
+    />
   );
 }
 
 export function TherapistCardSkeleton() {
   return (
-    <div className="rounded-2xl border border-[#F1F0EE] bg-white p-5 space-y-4">
-      <div className="flex items-start gap-4">
-        <Skeleton className="h-16 w-16 rounded-full flex-shrink-0" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-24" />
-          <Skeleton className="h-3 w-20" />
+    <div
+      className="rounded-2xl border p-5 flex flex-col h-full justify-between gap-4"
+      style={{ borderColor: 'var(--dash-border)', background: 'var(--dash-surface)' }}
+    >
+      <div className="space-y-4">
+        <div className="flex items-start gap-4">
+          <Skeleton className="h-16 w-16 rounded-full flex-shrink-0" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-20" />
+          </div>
         </div>
-      </div>
-      <div className="flex gap-2">
-        <Skeleton className="h-6 w-20 rounded-full" />
-        <Skeleton className="h-6 w-24 rounded-full" />
-        <Skeleton className="h-6 w-16 rounded-full" />
+        <div className="flex gap-2">
+          <Skeleton className="h-6 w-20 rounded-full" />
+          <Skeleton className="h-6 w-24 rounded-full" />
+          <Skeleton className="h-6 w-16 rounded-full" />
+        </div>
       </div>
       <div className="flex gap-2">
         <Skeleton className="h-10 flex-1 rounded-xl" />
@@ -32,7 +40,10 @@ export function TherapistCardSkeleton() {
 
 export function StatCardSkeleton() {
   return (
-    <div className="rounded-2xl border border-[#F1F0EE] bg-white p-6 space-y-3">
+    <div
+      className="rounded-2xl border p-6 space-y-3"
+      style={{ borderColor: 'var(--dash-border)', background: 'var(--dash-surface)' }}
+    >
       <Skeleton className="h-4 w-24" />
       <Skeleton className="h-8 w-16" />
       <Skeleton className="h-3 w-20" />

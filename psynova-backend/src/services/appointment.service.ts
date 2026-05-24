@@ -242,3 +242,115 @@ export async function saveSessionNotes(
     select: { id: true, sessionNotes: true },
   });
 }
+
+// ---------- NEW: therapist clients list ----------
+export async function getMyClients(therapistUserId: string) {
+  // Pull all completed/confirmed appointments for this therapist,
+  // then deduplicate by clientId.
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      therapistId: therapistUserId,
+      status: { in: ['CONFIRMED', 'COMPLETED'] },
+    },
+    select: {
+      clientId: true,
+      startTime: true,
+      status: true,
+      client: { select: { id: true, firstName: true, lastName: true, email: true } },
+    },
+    orderBy: { startTime: 'desc' },
+  });
+
+  // Group by client
+  const clientMap = new Map<string, {
+    id: string; firstName: string; lastName: string; email: string;
+    sessionCount: number; lastSession: Date | null;
+  }>();
+
+  for (const apt of appointments) {
+    const existing = clientMap.get(apt.clientId);
+    if (existing) {
+      existing.sessionCount += 1;
+      if (!existing.lastSession || apt.startTime > existing.lastSession) {
+        existing.lastSession = apt.startTime;
+      }
+    } else {
+      clientMap.set(apt.clientId, {
+        ...apt.client,
+        sessionCount: 1,
+        lastSession: apt.startTime,
+      });
+    }
+  }
+
+  return { clients: Array.from(clientMap.values()) };
+}
+
+// ---------- NEW: client payment history ----------
+export async function getClientPayments(clientUserId: string) {
+  const payments = await prisma.payment.findMany({
+    where: { userId: clientUserId },
+    include: {
+      appointment: {
+        select: {
+          id: true,
+          startTime: true,
+          endTime: true,
+          therapistUser: { select: { id: true, firstName: true, lastName: true } },
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return { payments };
+}
+
+// ---------- NEW: therapist earnings ----------
+export async function getTherapistEarnings(therapistUserId: string) {
+  // Find the therapist profile id first
+  const profile = await prisma.therapist.findUnique({
+    where: { userId: therapistUserId },
+    select: { id: true },
+  });
+
+  if (!profile) throw new AppError('Therapist profile not found', 404);
+
+  const [totalRevenue, monthRevenue, byMonth] = await Promise.all([
+    prisma.payment.aggregate({
+      where: {
+        status: 'COMPLETED',
+        appointment: { therapistId: therapistUserId },
+      },
+      _sum: { amount: true },
+    }),
+    prisma.payment.aggregate({
+      where: {
+        status: 'COMPLETED',
+        appointment: { therapistId: therapistUserId },
+        createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) },
+      },
+      _sum: { amount: true },
+    }),
+    prisma.$queryRaw<Array<{ month: Date; revenue: number }>>`
+      SELECT date_trunc('month', p."createdAt") AS month,
+             COALESCE(SUM(p."amount"), 0)::float AS revenue
+      FROM "Payment" p
+      JOIN "Appointment" a ON a.id = p."appointmentId"
+      WHERE p."status" = 'COMPLETED'
+        AND a."therapistId" = ${therapistUserId}
+        AND p."createdAt" >= (NOW() - INTERVAL '12 months')
+      GROUP BY 1
+      ORDER BY 1 ASC
+    `,
+  ]);
+
+  return {
+    totalRevenue: Number(totalRevenue._sum.amount ?? 0),
+    monthRevenue: Number(monthRevenue._sum.amount ?? 0),
+    byMonth: byMonth.map((r) => ({
+      month: `${r.month.getFullYear()}-${String(r.month.getMonth() + 1).padStart(2, '0')}`,
+      revenue: Number(r.revenue),
+    })),
+  };
+}

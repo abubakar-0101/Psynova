@@ -21,6 +21,16 @@ const RevenueAreaChart = dynamic(() => import('@/components/charts/RevenueAreaCh
   loading: () => <div className="h-[220px] animate-pulse rounded-xl bg-[#F1F0EE]" />,
 });
 
+interface PendingTherapist {
+  id: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    createdAt: string;
+  };
+}
+
 export default function AdminDashboardPage() {
   const qc = useQueryClient();
 
@@ -125,7 +135,7 @@ export default function AdminDashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {pendingTherapists.map((t: any) => (
+                {pendingTherapists.map((t: PendingTherapist) => (
                   <div
                     key={t.id}
                     className="flex items-center gap-4 rounded-2xl border border-[#F1F0EE] p-4"

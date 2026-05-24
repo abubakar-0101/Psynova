@@ -10,6 +10,8 @@ const admin = [authenticateToken, requireRole('ADMIN')];
 
 router.get('/me', ...admin, adminController.getMe);
 router.put('/me', ...admin, validate(updateAdminProfileSchema), adminController.updateMe);
+router.get('/me/upload-signature', ...admin, adminController.getUploadSignature);
+router.post('/me/photo', ...admin, adminController.updateProfilePhoto);
 
 router.get('/stats', ...admin, adminController.getDashboardStats);
 router.get('/users', ...admin, adminController.getAllUsers);

@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDebounce } from 'use-debounce';
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, Users, Calendar, DollarSign, CheckCircle, Flag, Settings, Search, Shield
@@ -20,25 +21,33 @@ const roleVariant: Record<string, 'default' | 'warning' | 'success'> = {
 
 export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 300);
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
+  const [page, setPage] = useState(1);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, roleFilter]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['admin', 'users'],
+    queryKey: ['admin', 'users', page, debouncedSearch, roleFilter],
     queryFn: async () => {
-      const res = await api.get('/api/admin/users');
+      const res = await api.get('/api/admin/users', {
+        params: {
+          page,
+          limit: 20,
+          search: debouncedSearch,
+          role: roleFilter,
+        },
+      });
       return res.data.data;
     },
   });
 
   const users: any[] = data?.users || [];
-
-  const filtered = users.filter((u) => {
-    const matchSearch =
-      !search ||
-      `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(search.toLowerCase());
-    const matchRole = roleFilter === 'ALL' || u.role === roleFilter;
-    return matchSearch && matchRole;
-  });
+  const total = data?.meta?.total || 0;
+  const totalPages = data?.meta?.totalPages || 0;
 
   return (
     <DashboardShell navItems={adminNav} title="User Management">
@@ -75,17 +84,17 @@ export default function AdminUsersPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              {isLoading ? 'Loading...' : `${filtered.length} users`}
+              {isLoading ? 'Loading...' : `${total} users`}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {isLoading ? (
               <div className="p-8 text-center text-[#6B7280] text-sm">Loading users...</div>
-            ) : filtered.length === 0 ? (
+            ) : users.length === 0 ? (
               <div className="p-8 text-center text-[#6B7280] text-sm">No users found</div>
             ) : (
               <div className="divide-y divide-[#F1F0EE]">
-                {filtered.map((u) => (
+                {users.map((u) => (
                   <div key={u.id} className="flex items-center gap-4 px-5 py-3.5">
                     <Avatar className="h-9 w-9 flex-shrink-0">
                       <AvatarFallback className="text-xs">
@@ -106,6 +115,25 @@ export default function AdminUsersPage() {
                       <span className="text-xs text-[#6B7280]">{formatDate(u.createdAt)}</span>
                     </div>
                   </div>
+                ))}
+              </div>
+            )}
+
+            {/* Pagination controls */}
+            {!isLoading && totalPages > 1 && (
+              <div className="flex justify-center gap-2 p-4 border-t border-[#F1F0EE]">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setPage(i + 1)}
+                    className={`h-9 w-9 rounded-xl text-sm font-medium transition-colors ${
+                      page === i + 1
+                        ? 'bg-[#4A90D9] text-white shadow-sm'
+                        : 'bg-white border border-[#F1F0EE] text-[#6B7280] hover:bg-[#F1F0EE]'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
                 ))}
               </div>
             )}

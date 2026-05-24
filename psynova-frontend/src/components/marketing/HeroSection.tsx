@@ -7,7 +7,7 @@ import { Search, ArrowRight, Sparkles, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const SPECIALIZATIONS = [
-  'Anxiety', 'Depression', 'Trauma', 'Couples', 'LGBTQ+', 'Grief', 'Stress', 'ADHD',
+  'Anxiety', 'Depression', 'Trauma', 'Couples', 'Grief', 'Stress', 'ADHD',
 ];
 
 export function HeroSection() {
