@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Heart, Instagram, Linkedin, MessageCircle } from 'lucide-react';
+import { Heart, Share2, MessageCircle, Globe } from 'lucide-react';
 
 const links = {
   platform: [
@@ -38,33 +38,36 @@ export function Footer() {
             <p className="text-[var(--muted-fg)] text-sm leading-relaxed max-w-xs">
               Therapy that actually fits your life. Connect with licensed therapists who understand you.
             </p>
-            <div className="mt-5 flex gap-4">
+            <div className="mt-5 flex gap-3">
               <a
                 href="https://www.linkedin.com/in/muhammadabubakarirshad/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[var(--muted-fg)] hover:text-blue-600 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs text-[var(--muted-fg)] hover:text-blue-600 transition-colors"
                 title="LinkedIn"
               >
-                <Linkedin className="h-5 w-5" />
+                <Share2 className="h-4 w-4" />
+                LinkedIn
               </a>
               <a
                 href="https://www.instagram.com/abubakar._.62?igsh=cWw3a2ozYzhwMm9r"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[var(--muted-fg)] hover:text-pink-600 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs text-[var(--muted-fg)] hover:text-pink-600 transition-colors"
                 title="Instagram"
               >
-                <Instagram className="h-5 w-5" />
+                <Globe className="h-4 w-4" />
+                Instagram
               </a>
               <a
                 href="https://wa.me/+923047773289"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[var(--muted-fg)] hover:text-green-600 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs text-[var(--muted-fg)] hover:text-green-600 transition-colors"
                 title="WhatsApp"
               >
-                <MessageCircle className="h-5 w-5" />
+                <MessageCircle className="h-4 w-4" />
+                WhatsApp
               </a>
             </div>
           </div>
