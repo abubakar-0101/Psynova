@@ -42,7 +42,7 @@ export default function TherapistReviewsPage() {
     queryKey: ['therapist-reviews', user?.therapistProfile?.id],
     queryFn: async () => {
       const res = await api.get(`/api/therapists/${user?.therapistProfile?.id}/reviews`);
-      return res.data.data;
+      return res.data.data || { reviews: [] };
     },
     enabled: !!user?.therapistProfile?.id,
   });
