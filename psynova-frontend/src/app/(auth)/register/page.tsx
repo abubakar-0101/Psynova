@@ -5,8 +5,8 @@ import { z } from 'zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Eye, EyeOff, User, Mail, Lock, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/toaster';
@@ -26,6 +26,33 @@ const registerSchema = z.object({
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
+function getPasswordStrength(password: string): { strength: number; label: string; color: string; requirements: { met: boolean; label: string }[] } {
+  const requirements = [
+    { met: password.length >= 8, label: 'At least 8 characters' },
+    { met: /[A-Z]/.test(password), label: 'Contains uppercase' },
+    { met: /[0-9]/.test(password), label: 'Contains number' },
+    { met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password), label: 'Contains special character' },
+    { met: password.length >= 12, label: 'At least 12 characters (strong)' },
+  ];
+
+  const metCount = requirements.filter(r => r.met).length;
+  const strength = Math.min((metCount / 3) * 100, 100);
+
+  let label = 'Weak';
+  let color = 'bg-red-500';
+
+  if (metCount >= 3 && password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+    label = 'Good';
+    color = 'bg-yellow-500';
+  }
+  if (metCount >= 4) {
+    label = 'Strong';
+    color = 'bg-green-500';
+  }
+
+  return { strength, label, color, requirements };
+}
+
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { register: registerUser, registerPending } = useAuth();
@@ -36,13 +63,18 @@ export default function RegisterPage() {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: { role: 'CLIENT' },
+    mode: 'onChange',
   });
 
   const role = watch('role');
+  const password = watch('password');
+
+  const passwordStrength = useMemo(() => getPasswordStrength(password || ''), [password]);
+  const isPasswordValid = password && /[A-Z]/.test(password) && /[0-9]/.test(password) && password.length >= 8;
 
   const onSubmit = async (data: RegisterForm) => {
     try {
@@ -124,15 +156,66 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5 text-[var(--muted-fg)]"
+                  className="absolute right-3 top-3.5 text-[var(--muted-fg)] hover:text-[var(--fg)]"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && <p className="mt-1 text-xs text-[var(--danger)]">{errors.password.message}</p>}
+
+              {password && (
+                <div className="mt-3 space-y-2">
+                  {/* Strength bar */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[var(--muted-fg)]">Password strength</span>
+                      <motion.span
+                        className={`text-xs font-medium ${
+                          passwordStrength.label === 'Weak'
+                            ? 'text-red-500'
+                            : passwordStrength.label === 'Good'
+                            ? 'text-yellow-500'
+                            : 'text-green-500'
+                        }`}
+                        animate={{ opacity: 1 }}
+                        initial={{ opacity: 0 }}
+                      >
+                        {passwordStrength.label}
+                      </motion.span>
+                    </div>
+                    <div className="h-2 bg-[var(--subtle)] rounded-full overflow-hidden">
+                      <motion.div
+                        className={`h-full rounded-full ${passwordStrength.color} transition-all`}
+                        animate={{ width: `${passwordStrength.strength}%` }}
+                        initial={{ width: 0 }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Requirements checklist */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    {passwordStrength.requirements.slice(0, 4).map((req, idx) => (
+                      <div key={idx} className="flex items-center gap-1.5 text-[var(--muted-fg)]">
+                        {req.met ? (
+                          <Check className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                        ) : (
+                          <X className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />
+                        )}
+                        <span className={req.met ? 'text-green-600' : 'text-[var(--muted-fg)]'}>{req.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {errors.password && <p className="mt-2 text-xs text-[var(--danger)]">{errors.password.message}</p>}
             </div>
 
-            <Button type="submit" className="w-full mt-2" isLoading={registerPending}>
+            <Button
+              type="submit"
+              className="w-full mt-4"
+              isLoading={registerPending}
+              disabled={!isPasswordValid || !isValid || registerPending}
+            >
               Create Account
             </Button>
           </form>
