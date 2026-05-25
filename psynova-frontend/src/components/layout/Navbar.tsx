@@ -50,6 +50,13 @@ export function Navbar() {
       ? '/dashboard/therapist'
       : '/dashboard/admin';
 
+  const profileHref =
+    user?.role === 'CLIENT'
+      ? '/dashboard/client/profile'
+      : user?.role === 'THERAPIST'
+      ? '/dashboard/therapist/profile'
+      : '/dashboard/admin/profile';
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -153,7 +160,7 @@ export function Navbar() {
                           Dashboard
                         </Link>
                         <Link
-                          href="/profile"
+                          href={profileHref}
                           className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[var(--fg)] hover:bg-[var(--subtle)] transition-colors"
                           onClick={() => setUserMenuOpen(false)}
                         >
