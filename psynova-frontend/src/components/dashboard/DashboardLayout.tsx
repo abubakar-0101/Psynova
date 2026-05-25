@@ -16,7 +16,7 @@ import { ThemeToggle } from '@/components/layout/ThemeToggle';
 interface NavItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: LucideIcon | string;
 }
 
 interface DashboardLayoutProps {
@@ -54,8 +54,11 @@ export function DashboardShell({ children, navItems, title }: DashboardLayoutPro
 
       {/* Nav */}
       <nav className="flex-1 p-4 space-y-0.5">
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {navItems.map(({ href, label, icon }) => {
           const active = pathname === href || pathname.startsWith(href + '/');
+          const isEmoji = typeof icon === 'string';
+          const Icon = !isEmoji ? icon : null;
+
           return (
             <Link
               key={href}
@@ -79,7 +82,11 @@ export function DashboardShell({ children, navItems, title }: DashboardLayoutPro
                 }
               }}
             >
-              <Icon className="h-5 w-5 flex-shrink-0" />
+              {isEmoji ? (
+                <span className="text-lg">{icon}</span>
+              ) : (
+                Icon && <Icon className="h-5 w-5 flex-shrink-0" />
+              )}
               {label}
             </Link>
           );
