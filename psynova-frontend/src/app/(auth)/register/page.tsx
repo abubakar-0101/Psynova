@@ -117,7 +117,8 @@ export default function RegisterPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Min 8 chars, uppercase, number"
-                  className={`${inputClass} pr-10`}
+                  className={`${inputClass} pr-10 [&::-ms-reveal]:hidden`}
+                  style={{ WebkitTextSecurity: showPassword ? 'none' : 'disc' } as React.CSSProperties}
                   {...register('password')}
                 />
                 <button
