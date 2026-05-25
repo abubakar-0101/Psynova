@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
+import { Heart, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 
 const links = {
   platform: [
@@ -39,15 +39,33 @@ export function Footer() {
               Therapy that actually fits your life. Connect with licensed therapists who understand you.
             </p>
             <div className="mt-5 flex gap-4">
-              {['Twitter', 'LinkedIn', 'Instagram'].map((s) => (
-                <a
-                  key={s}
-                  href="#"
-                  className="text-[var(--muted-fg)] hover:text-[var(--fg)] transition-colors text-sm"
-                >
-                  {s}
-                </a>
-              ))}
+              <a
+                href="https://www.linkedin.com/in/muhammadabubakarirshad/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--muted-fg)] hover:text-blue-600 transition-colors"
+                title="LinkedIn"
+              >
+                <Linkedin className="h-5 w-5" />
+              </a>
+              <a
+                href="https://www.instagram.com/abubakar._.62?igsh=cWw3a2ozYzhwMm9r"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--muted-fg)] hover:text-pink-600 transition-colors"
+                title="Instagram"
+              >
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a
+                href="https://wa.me/+923047773289"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--muted-fg)] hover:text-green-600 transition-colors"
+                title="WhatsApp"
+              >
+                <MessageCircle className="h-5 w-5" />
+              </a>
             </div>
           </div>
 
