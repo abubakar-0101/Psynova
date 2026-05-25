@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { Send, Paperclip, Lock, Search } from 'lucide-react';
+import { Send, Paperclip, Lock, Search, ArrowLeft } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -164,6 +165,15 @@ export default function MessagesPage() {
     ? (typingUsers[activeConvId] || []).filter((id) => id !== user?.id)
     : [];
 
+  const dashboardHref =
+    user?.role === 'CLIENT'
+      ? '/dashboard/client'
+      : user?.role === 'THERAPIST'
+      ? '/dashboard/therapist'
+      : '/dashboard/admin';
+
+  const router = useRouter();
+
   return (
     <div className="h-screen flex flex-col bg-[#FAFAF9]">
       <Navbar />
@@ -171,7 +181,16 @@ export default function MessagesPage() {
         {/* Sidebar */}
         <div className="w-72 flex-shrink-0 border-r border-[#F1F0EE] bg-white flex flex-col">
           <div className="p-4 border-b border-[#F1F0EE]">
-            <h2 className="font-semibold text-[#1A1A2E] mb-3">Messages</h2>
+            <div className="flex items-center gap-3 mb-3">
+              <button
+                onClick={() => router.push(dashboardHref)}
+                className="p-1.5 rounded-lg hover:bg-[#F1F0EE] transition-colors text-[#6B7280]"
+                title="Back to dashboard"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <h2 className="font-semibold text-[#1A1A2E]">Messages</h2>
+            </div>
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#6B7280]" />
               <input
